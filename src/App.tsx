@@ -7,6 +7,7 @@ import IndicatorWeather from './components/IndicatorWeather';
 import TableWeather from './components/TableWeather';
 import ControlWeather from './components/ControlWeather';
 import LineChartWeather from './components/LineChartWeather';
+import { Item } from "./interface/Item";
 
 import { useEffect, useState } from 'react';
 interface Indicator {
@@ -21,6 +22,8 @@ function App() {
   {/* Variable de estado y función de actualización */ }
   let [indicators, setIndicators] = useState<Indicator[]>([])
   let [owm, setOWM] = useState(localStorage.getItem("openWeatherMap"))
+  
+  const [items, setItems] = useState<Item[]>([]);
 
   {/* Hook: useEffect */ }
   useEffect(() => {
@@ -66,7 +69,6 @@ function App() {
         {/* XML Parser */ }
         const parser = new DOMParser();
         const xml = parser.parseFromString(savedTextXML, "application/xml");
-
         {/* Arreglo para agregar los resultados */ }
 
         let dataToIndicators: Indicator[] = new Array<Indicator>();
@@ -95,11 +97,44 @@ function App() {
         {/* Modificación de la variable de estado mediante la función de actualización */ }
         setIndicators(dataToIndicators)
 
+        let dataToItems: Item[] = [];
+        const timeNodes = xml.getElementsByTagName("time");
 
+        for (let i = 0; i < timeNodes.length; i++) {
+          const timeNode = timeNodes[i];
+          const dateStart = timeNode.getAttribute("from") || "";
+          const dateEnd = timeNode.getAttribute("to") || "";
+
+          const precipitationNode = timeNode.getElementsByTagName("precipitation")[0];
+          const precipitation = precipitationNode?.getAttribute("probability") || "";
+
+          const humidityNode = timeNode.getElementsByTagName("humidity")[0];
+          const humidity = humidityNode?.getAttribute("value") || "";
+
+          const cloudsNode = timeNode.getElementsByTagName("clouds")[0];
+          const clouds = cloudsNode?.getAttribute("all") || "";
+
+          const item: Item = {
+            dateStart,
+            dateEnd,
+            precipitation,
+            humidity,
+            clouds,
+          };
+
+          dataToItems.push(item);
+        }
+
+        // Limitar a los primeros 6 elementos
+        const limitedDataToItems = dataToItems.slice(0, 6);
+        setItems(limitedDataToItems);
       }
-    }
+  };
 
-    request();
+
+    
+
+  request();
 
   }, [owm])
 
@@ -145,7 +180,7 @@ function App() {
             <ControlWeather />
           </Grid>
           <Grid size={{ xs: 12, xl: 9 }}>
-            <TableWeather />
+            <TableWeather itemsIn={ items } />
           </Grid>
         </Grid>
       </Grid>
