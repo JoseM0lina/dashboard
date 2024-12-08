@@ -6,7 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Item from '../interface/item';
+import Item from '../interface/Item';
 
 interface MyProp {
   itemsIn: Item[];
@@ -20,7 +20,7 @@ export default function BasicTable(props: MyProp) {
   }, [props.itemsIn]);
 
   // Función para extraer la hora de una fecha en formato ISO
-  const extractTime = (isoString: string): string => {
+  const extractTime = (isoString: String): String => {
     return isoString.split('T')[1]?.split('+')[0]; // Toma la hora y elimina la zona horaria, si existe
   };
 

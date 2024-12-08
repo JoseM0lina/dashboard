@@ -7,7 +7,7 @@ import IndicatorWeather from './components/IndicatorWeather';
 import TableWeather from './components/TableWeather';
 import ControlWeather from './components/ControlWeather';
 import LineChartWeather from './components/LineChartWeather';
-import { Item } from "./interface/Item";
+import Item from "../interface/Item";
 
 import { useEffect, useState } from 'react';
 interface Indicator {
