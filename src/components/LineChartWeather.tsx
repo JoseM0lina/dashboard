@@ -19,7 +19,7 @@ export default function LineChartWeather({ time, values }: LineChartWeatherProps
         >
             <LineChart
                 width={1200}
-                height={450}
+                height={400}
                 margin={{ left: 100, right: 100 }}
                 sx={{ paddingBottom: 2 }}
                 series={[

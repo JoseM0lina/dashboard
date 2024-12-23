@@ -237,7 +237,7 @@ function App() {
 
     request();
 
-  }, [location])
+  }, [location, owm, refresh])
 
   let renderIndicators = () => {
     return indicators

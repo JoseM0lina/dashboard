@@ -57,9 +57,30 @@ export default function Header({ toggleTheme }: HeaderProps) {
           open={Boolean(anchorElDetalle)}
           onClose={handleDetalleMenuClose}
         >
-          <MenuItem onClick={() => handleScrollToSection("condi_actu")}>Condiciones actuales</MenuItem>
-          <MenuItem onClick={() => handleScrollToSection("ten_clima")}>Tendencias climáticas</MenuItem>
-          <MenuItem onClick={() => handleScrollToSection("pronosticos")}>Pronósticos del tiempo</MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleScrollToSection("condi_actu");
+              handleDetalleMenuClose(); // Cerrar el menú al hacer clic
+            }}
+          >
+            Condiciones actuales
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleScrollToSection("ten_clima");
+              handleDetalleMenuClose(); // Cerrar el menú al hacer clic
+            }}
+          >
+            Tendencias climáticas
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleScrollToSection("pronosticos");
+              handleDetalleMenuClose(); // Cerrar el menú al hacer clic
+            }}
+          >
+            Pronósticos del tiempo
+          </MenuItem>
         </Menu>
         <Typography
           variant="h5"

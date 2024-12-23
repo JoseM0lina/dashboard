@@ -22,7 +22,7 @@ export default function ControlWeather({ latitude, longitude }: ControlWeatherPr
         { name: "Probabilidad de Precipitación", key: "precipitation_probability", description: "Probabilidad de lluvia en porcentaje." },
     ];
 
-    const [selected, setSelected] = useState(-1);
+    const [selected, setSelected] = useState<string>('-1');
     const [chartData, setChartData] = useState<{ time: string[]; values: number[] }>({ time: [], values: [] });
     const [loading, setLoading] = useState(false);
 
@@ -46,13 +46,14 @@ export default function ControlWeather({ latitude, longitude }: ControlWeatherPr
     };
 
     const handleChange = (event: SelectChangeEvent) => {
-        const idx = parseInt(event.target.value);
+        const idx = event.target.value;
         setSelected(idx);
         if (descriptionRef.current) {
-            descriptionRef.current.innerHTML = idx >= 0 ? items[idx].description : "";
+            const selectedIdx = parseInt(idx);
+            descriptionRef.current.innerHTML = selectedIdx >= 0 ? items[selectedIdx].description : "";
         }
-        if (idx >= 0) {
-            fetchData(items[idx].key);
+        if (parseInt(idx) >= 0) {
+            fetchData(items[parseInt(idx)].key);
         }
     };
 
@@ -76,7 +77,7 @@ export default function ControlWeather({ latitude, longitude }: ControlWeatherPr
                         labelId="simple-select-label"
                         id="simple-select"
                         label="Variables"
-                        defaultValue='-1'
+                        value={selected}
                         onChange={handleChange}
                     >
                         <MenuItem key="-1" value="-1" disabled>Seleccione una variable</MenuItem>
