@@ -8,6 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Item from '../interface/Item';
 
+import { Cloud, Air, WaterDrop, BeachAccess } from '@mui/icons-material';
+
 interface MyProp {
   itemsIn: Item[];
 }
@@ -19,36 +21,41 @@ export default function BasicTable(props: MyProp) {
     setRows(props.itemsIn);
   }, [props.itemsIn]);
 
-  // Función para extraer la hora de una fecha en formato ISO
   const extractTime = (isoString: String): String => {
-    return isoString.split('T')[1]?.split('+')[0]; // Toma la hora y elimina la zona horaria, si existe
+    return isoString.split('T')[1]?.split('+')[0];
+  };
+
+  const extractDay = (isoString: String): String => {
+    return isoString.split('T')[0]
   };
 
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
+        <TableHead sx={{ backgroundColor: "rgb(45, 23, 117)" }}>
           <TableRow>
-            <TableCell>Hora de inicio</TableCell>
-            <TableCell align="right">Hora de fin</TableCell>
-            <TableCell align="right">Precipitación</TableCell>
-            <TableCell align="right">Humedad</TableCell>
-            <TableCell align="right">Nubosidad</TableCell>
+            <TableCell sx={{ color: 'white' }}>INTERVALO DE TIEMPO</TableCell>
+            <TableCell align="left" sx={{ color: 'white' }}>HUMEDAD</TableCell>
+            <TableCell align="left" sx={{ color: 'white' }}>PRESIÓN</TableCell>
+            <TableCell align="left" sx={{ color: 'white' }}>PROBABILIDAD DE PRECIPITACIÓN</TableCell>
+            <TableCell align="left" sx={{ color: 'white' }}>CONDICIÓN DEL CIELO</TableCell>
+            <TableCell align="left" sx={{ color: 'white' }}>RAFAGAS DE VIENTO</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody sx={{ backgroundColor: "rgb(34, 110, 224)" }}>
           {rows.map((row, idx) => (
             <TableRow
               key={idx}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
-              <TableCell component="th" scope="row">
-                {extractTime(row.dateStart)}
+              <TableCell component="th" scope="row" sx={{ color: 'white' }}>
+                {extractDay(row.dateStart)} - {extractTime(row.dateStart)} a {extractTime(row.dateEnd)}
               </TableCell>
-              <TableCell align="right">{extractTime(row.dateEnd)}</TableCell>
-              <TableCell align="right">{row.precipitation}</TableCell>
-              <TableCell align="right">{row.humidity}</TableCell>
-              <TableCell align="right">{row.clouds}</TableCell>
+              <TableCell align="left" sx={{ color: 'white' }}><WaterDrop /> {row.humidity} %</TableCell>
+              <TableCell align="left" sx={{ color: 'white' }}>{row.pressure} hpa</TableCell>
+              <TableCell align="left" sx={{ color: 'white' }}><BeachAccess /> {row.precipitation} %</TableCell>
+              <TableCell align="left" sx={{ color: 'white' }}><Cloud /> {row.clouds}</TableCell>
+              <TableCell align="left" sx={{ color: 'white' }}><Air /> {row.windGust} m/s</TableCell>
             </TableRow>
           ))}
         </TableBody>

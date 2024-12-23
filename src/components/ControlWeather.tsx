@@ -1,63 +1,75 @@
-{/* Componentes MUI */}
-
+import { useState, useRef } from 'react';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-
-import { useState, useRef } from 'react';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-   
-export default function ControlWeather() {
+import LineChartWeather from './LineChartWeather';
 
-     {/* Constante de referencia a un elemento HTML */ }
-     const descriptionRef = useRef<HTMLDivElement>(null);
+interface ControlWeatherProps {
+    latitude: string;
+    longitude: string;
+}
 
-    {/* Arreglo de objetos */}
-    let items = [
-        {"name":"Precipitación", "description":"Cantidad de agua que cae sobre una superficie en un período específico."}, 
-        {"name": "Humedad", "description":"Cantidad de vapor de agua presente en el aire, generalmente expresada como un porcentaje."}, 
-        {"name":"Nubosidad", "description":"Grado de cobertura del cielo por nubes, afectando la visibilidad y la cantidad de luz solar recibida."}
-    ]
+export default function ControlWeather({ latitude, longitude }: ControlWeatherProps) {
+    const descriptionRef = useRef<HTMLDivElement>(null);
 
-    {/* Arreglo de elementos JSX */}
-    let options = items.map( (item, key) => <MenuItem key={key} value={key}>{item["name"]}</MenuItem> )
+    const items = [
+        { name: "Humedad Relativa", key: "relative_humidity_2m", description: "Porcentaje de humedad en el aire." },
+        { name: "Temperatura Aparente", key: "apparent_temperature", description: "Temperatura percibida en grados Celsius." },
+        { name: "Probabilidad de Precipitación", key: "precipitation_probability", description: "Probabilidad de lluvia en porcentaje." },
+    ];
 
-    {/* Manejador de eventos */}
-    const handleChange = (event: SelectChangeEvent) => {
+    const [selected, setSelected] = useState(-1);
+    const [chartData, setChartData] = useState<{ time: string[]; values: number[] }>({ time: [], values: [] });
+    const [loading, setLoading] = useState(false);
 
-        let idx = parseInt(event.target.value)
-        // alert( idx );
-        setSelected( idx );
-
-        {/* Modificación de la referencia descriptionRef */}
-        if (descriptionRef.current !== null) {
-            descriptionRef.current.innerHTML = (idx >= 0) ? items[idx]["description"] : ""
+    const fetchData = async (variableKey: string) => {
+        setLoading(true);
+        try {
+            const response = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=${variableKey}&timezone=auto&forecast_days=1`
+            );
+            const data = await response.json();
+            const time = data.hourly.time.map((datetime: string) => {
+                return datetime.split("T")[1].slice(0, 5);
+            });
+            const values = data.hourly[variableKey];
+            setChartData({ time, values });
+        } catch (error) {
+            console.error("Error al obtener datos de la API:", error);
+        } finally {
+            setLoading(false);
         }
-
     };
 
-    {/* Variable de estado y función de actualización */}
-    let [, setSelected] = useState(-1)
-       
-    {/* JSX */}
+    const handleChange = (event: SelectChangeEvent) => {
+        const idx = parseInt(event.target.value);
+        setSelected(idx);
+        if (descriptionRef.current) {
+            descriptionRef.current.innerHTML = idx >= 0 ? items[idx].description : "";
+        }
+        if (idx >= 0) {
+            fetchData(items[idx].key);
+        }
+    };
+
     return (
         <Paper
+            elevation={3}
             sx={{
                 p: 2,
                 display: 'flex',
                 flexDirection: 'column'
             }}
         >
-
             <Typography mb={2} component="h3" variant="h6" color="primary">
                 Variables Meteorológicas
             </Typography>
 
             <Box sx={{ minWidth: 120 }}>
-                   
                 <FormControl fullWidth>
                     <InputLabel id="simple-select-label">Variables</InputLabel>
                     <Select
@@ -68,23 +80,22 @@ export default function ControlWeather() {
                         onChange={handleChange}
                     >
                         <MenuItem key="-1" value="-1" disabled>Seleccione una variable</MenuItem>
-
-                        {options}
-
+                        {items.map((item, index) => (
+                            <MenuItem key={index} value={index}>{item.name}</MenuItem>
+                        ))}
                     </Select>
                 </FormControl>
-
             </Box>
-            
-            {/* Use la variable de estado para renderizar del item seleccionado */}
-            {/* <Typography mt={2} component="p" color="text.secondary">
-             {
-                 (selected >= 0)?items[selected]["description"]:""
-             }
-             </Typography> */}
-             <Typography ref={descriptionRef} mt={2} component="p" color="text.secondary" />
+
+            <Typography sx={{ paddingBottom: "1rem" }} ref={descriptionRef} mt={2} component="p" color="text.secondary" />
+
+            {loading ? (
+                <Typography mt={2} component="p" color="text.secondary">
+                    Cargando datos...
+                </Typography>
+            ) : chartData.values.length > 0 && (
+                <LineChartWeather time={chartData.time} values={chartData.values} />
+            )}
         </Paper>
-
-
-    )
+    );
 }

@@ -1,37 +1,50 @@
 import Paper from '@mui/material/Paper';
 import { LineChart } from '@mui/x-charts/LineChart';
 
-const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
-const xLabels = [
-    'Page A',
-    'Page B',
-    'Page C',
-    'Page D',
-    'Page E',
-    'Page F',
-    'Page G',
-];
+interface LineChartWeatherProps {
+    time: string[];
+    values: number[];
+}
 
-export default function LineChartWeather() {
+export default function LineChartWeather({ time, values }: LineChartWeatherProps) {
     return (
         <Paper
+            elevation={2}
             sx={{
                 p: 2,
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                alignItems: 'center'
             }}
         >
-
-            {/* Componente para un gráfico de líneas */}
             <LineChart
-                width={400}
-                height={250}
+                width={1200}
+                height={450}
+                margin={{ left: 100, right: 100 }}
+                sx={{ paddingBottom: 2 }}
                 series={[
-                    { data: pData, label: 'pv' },
-                    { data: uData, label: 'uv' },
+                    {
+                        data: values,
+                        color: '#007BFF',
+                        area: false,
+                    },
                 ]}
-                xAxis={[{ scaleType: 'point', data: xLabels }]}
+                xAxis={[
+                    {
+                        scaleType: 'point',
+                        data: time,
+                        label: 'HORAS DEL DÍA',
+                        tickSize: 10,
+                        labelStyle: { fontSize: 15, fill: '#007BFF', transform: 'translate(0, 5px)' },
+                    },
+                ]}
+                yAxis={[
+                    {
+                        min: 0,
+                        max: 100,
+                        tickSize: 10,
+                    },
+                ]}
             />
         </Paper>
     );
